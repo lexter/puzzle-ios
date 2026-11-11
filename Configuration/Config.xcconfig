@@ -1,0 +1,4 @@
+// Apple developer team used for signing (needed to run on a device).
+TEAM_ID=K4AWSZ53P9
+BUNDLE_ID=com.lexterlabra.puzzle
+APP_NAME=Slide Puzzle
