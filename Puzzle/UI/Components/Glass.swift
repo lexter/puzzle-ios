@@ -48,25 +48,58 @@ struct GlassBackdrop: View {
     }()
 }
 
-/// Frosted candy panel used for every bar, card, chip and sheet.
+/// Panel used for every bar, card, chip and sheet, rendered with the system's glass:
+/// Liquid Glass (`glassEffect`) on iOS 26 and later, system materials on earlier versions.
+///
+/// - `solid`: floating surfaces over the board (dialogs, countdown, pause) get a thicker,
+///   tinted glass so their text stays readable.
+/// - `interactive`: tappable surfaces react to touch (system press highlight and shimmer).
+/// - `tint`: colors the glass, e.g. a selected chip.
 struct GlassSurface<S: InsettableShape, Content: View>: View {
     var shape: S
     var solid = false
+    var interactive = false
+    var tint: Color?
     @ViewBuilder var content: Content
     @Environment(\.palette) private var palette
 
     var body: some View {
-        content
-            .background(shape.fill(solid ? palette.glassTintSolid : palette.glassTint))
-            .clipShape(shape)
-            .overlay(shape.strokeBorder(palette.glassBorder, lineWidth: 1))
-            .shadow(color: solid ? Color.black.opacity(0.25) : .clear, radius: solid ? 12 : 0, y: solid ? 6 : 0)
+        if #available(iOS 26.0, *) {
+            content.glassEffect(glass, in: shape)
+        } else {
+            content
+                .background(solid ? Material.thick : Material.ultraThin, in: shape)
+                .background(shape.fill(fallbackTint ?? .clear))
+                .clipShape(shape)
+        }
     }
+
+    @available(iOS 26.0, *)
+    private var glass: Glass {
+        var glass = Glass.regular
+        if let tint = tint ?? (solid ? palette.glassTintSolid.opacity(0.55) : nil) { glass = glass.tint(tint) }
+        if interactive { glass = glass.interactive() }
+        return glass
+    }
+
+    private var fallbackTint: Color? { tint ?? (solid ? palette.glassTintSolid.opacity(0.55) : nil) }
 }
 
 extension GlassSurface where S == RoundedRectangle {
-    init(cornerRadius: CGFloat = 28, solid: Bool = false, @ViewBuilder content: () -> Content) {
-        self.init(shape: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous), solid: solid, content: content)
+    init(
+        cornerRadius: CGFloat = 28,
+        solid: Bool = false,
+        interactive: Bool = false,
+        tint: Color? = nil,
+        @ViewBuilder content: () -> Content
+    ) {
+        self.init(
+            shape: RoundedRectangle(cornerRadius: cornerRadius, style: .continuous),
+            solid: solid,
+            interactive: interactive,
+            tint: tint,
+            content: content
+        )
     }
 }
 

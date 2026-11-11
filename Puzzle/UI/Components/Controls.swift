@@ -10,7 +10,7 @@ struct GlassIconButton: View {
 
     var body: some View {
         Button(action: action) {
-            GlassSurface(cornerRadius: 16) {
+            GlassSurface(cornerRadius: 16, interactive: true) {
                 Image(systemName: systemImage)
                     .font(.system(size: 19, weight: .semibold))
                     .foregroundColor(tint ?? palette.text)
@@ -88,7 +88,7 @@ struct GlassButton: View {
 
     var body: some View {
         Button(action: action) {
-            GlassSurface(cornerRadius: 20) {
+            GlassSurface(cornerRadius: 20, interactive: true) {
                 HStack(spacing: 8) {
                     if let systemImage {
                         Image(systemName: systemImage).font(.system(size: 17, weight: .semibold)).foregroundColor(iconTint ?? palette.text)

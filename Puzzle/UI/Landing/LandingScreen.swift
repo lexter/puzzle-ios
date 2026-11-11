@@ -108,12 +108,12 @@ private struct MiniBoard: View {
     var body: some View {
         let shape = RoundedRectangle(cornerRadius: 16, style: .continuous)
         VStack(spacing: 6) {
-            BoardView(state: state, image: image, interactive: false)
-                .opacity(alpha)
-                .padding(6)
-                .frame(width: 132, height: 132)
-                .background(shape.fill(palette.glassTintSolid))
-                .clipShape(shape)
+            GlassSurface(shape: shape, solid: true) {
+                BoardView(state: state, image: image, interactive: false)
+                    .opacity(alpha)
+                    .padding(6)
+                    .frame(width: 132, height: 132)
+            }
                 .overlay(shape.strokeBorder(ring, lineWidth: 2.5))
                 .shadow(color: ring.opacity(0.6), radius: 10)
             Text(label).font(.system(size: 13, weight: .heavy)).tracking(1).foregroundColor(ring)

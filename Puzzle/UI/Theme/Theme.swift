@@ -41,9 +41,7 @@ struct PuzzlePalette {
     let text: Color
     let secondaryText: Color
     let background: Color
-    let glassTint: Color
     let glassTintSolid: Color
-    let glassBorder: Color
     let selectedFill: Color
     let selectedText: Color
     let opponentAccent: Color
@@ -60,9 +58,7 @@ struct PuzzlePalette {
         text: Color(argb: 0xFFF4F1FF),
         secondaryText: Color(argb: 0xFFEBCFF2),
         background: Color(argb: 0xFF2A0E4F),
-        glassTint: Color.white.opacity(0.12),
         glassTintSolid: Color(argb: 0xFF3B1868).opacity(0.97),
-        glassBorder: Color.white.opacity(0.24),
         selectedFill: Color(argb: 0xFFF4F1FF),
         selectedText: Color(argb: 0xFF4A1D3F),
         opponentAccent: Color(argb: 0xFFFF8A3D),
@@ -80,9 +76,7 @@ struct PuzzlePalette {
         text: Color(argb: 0xFF4A1D3F),
         secondaryText: Color(argb: 0xFF7A4A63),
         background: Color(argb: 0xFFFFF1E6),
-        glassTint: Color.white.opacity(0.82),
         glassTintSolid: Color.white.opacity(0.97),
-        glassBorder: Color(argb: 0xFFFF4FA3).opacity(0.18),
         selectedFill: Color(argb: 0xFF4A1D3F),
         selectedText: .white,
         opponentAccent: Color(argb: 0xFFC2410C),
@@ -151,9 +145,11 @@ struct PuzzleTheme<Content: View>: View {
     @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
-        let palette = resolveDark(appearance, systemDark: colorScheme == .dark) ? PuzzlePalette.dark : PuzzlePalette.light
+        let isDark = resolveDark(appearance, systemDark: colorScheme == .dark)
+        let palette = isDark ? PuzzlePalette.dark : PuzzlePalette.light
         content
             .environment(\.palette, palette)
+            .environment(\.colorScheme, isDark ? .dark : .light)
             .foregroundColor(palette.text)
             .tint(palette.accent)
     }

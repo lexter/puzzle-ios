@@ -171,8 +171,8 @@ private struct GridChip: View {
     @Environment(\.palette) private var palette
 
     var body: some View {
-        let shape = RoundedRectangle(cornerRadius: 14, style: .continuous)
         Button(action: action) {
+            GlassSurface(cornerRadius: 14, interactive: true, tint: selected ? palette.accent : nil) {
             Text("\(n)×\(n)")
                 .font(.system(size: 13, weight: .bold))
                 .lineLimit(1)
@@ -180,8 +180,7 @@ private struct GridChip: View {
                 .foregroundColor(selected ? palette.onAccent : palette.text)
                 .frame(maxWidth: .infinity)
                 .frame(height: 46)
-                .background(shape.fill(selected ? palette.accent : palette.glassTint))
-                .overlay(shape.strokeBorder(selected ? palette.accent : palette.glassBorder, lineWidth: 1))
+            }
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(selected ? .isSelected : [])
@@ -196,7 +195,7 @@ private struct SourceTile: View {
 
     var body: some View {
         Button(action: action) {
-            GlassSurface(cornerRadius: 20) {
+            GlassSurface(cornerRadius: 20, interactive: true) {
                 VStack(spacing: 4) {
                     Image(systemName: systemImage).font(.system(size: 20, weight: .semibold)).foregroundColor(palette.accent)
                     Text(label).font(.system(size: 13, weight: .semibold)).foregroundColor(palette.text)
