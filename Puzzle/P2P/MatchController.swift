@@ -217,7 +217,8 @@ final class MatchController: ObservableObject {
         case .config(let config): if role == .guest { onConfig(config) }
         case .ready: if role == .host { state.peerReady = true }
         case .imageFailed: if role == .host { onImageFailed() }
-        case .start(let countdownMs): if role == .guest && state.phase == .configured { beginCountdown(countdownMs) }
+        case .start(let countdownMs):
+            if role == .guest && state.phase == .configured { beginCountdown(min(max(countdownMs, 0), MatchMessage.maxCountdownMs)) }
         case let .progress(tiles, moves, _): onProgress(tiles: tiles, moves: moves)
         case .solved(let elapsedMs, _): if role == .host { decide(hostWon: false, winnerTimeMs: elapsedMs) }
         case let .result(winnerIsHost, winnerTimeMs): if role == .guest { finish(iWon: !winnerIsHost, winnerTimeMs: winnerTimeMs) }
@@ -238,6 +239,7 @@ final class MatchController: ObservableObject {
     }
 
     private func onConfig(_ config: MatchConfig) {
+        guard config.isValid else { return }
         pendingConfig = config
         if !config.customImage { markReady(config, imageBytes: nil) }
     }
@@ -327,5 +329,5 @@ final class MatchController: ObservableObject {
 
 /// `Task.sleep` that just returns early when cancelled.
 func sleep(ms: Int64) async {
-    try? await Task.sleep(nanoseconds: UInt64(max(ms, 0)) * 1_000_000)
+    try? await Task.sleep(nanoseconds: UInt64(min(max(ms, 0), Int64.max / 1_000_000)) * 1_000_000)
 }

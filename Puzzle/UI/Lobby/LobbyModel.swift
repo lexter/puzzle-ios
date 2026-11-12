@@ -28,7 +28,7 @@ final class LobbyModel: ObservableObject, ScreenModel {
     private var hubSubscription: AnyCancellable?
     private(set) lazy var picker = ImagePicker { [weak self] in self?.setPicture($0) }
 
-    init(mode: Mode, settings: SettingsStore, hub: MatchHub, deviceName: () -> String = DeviceName.get, initialPhoto: ChosenPhoto? = nil) {
+    init(mode: Mode, settings: SettingsStore, hub: MatchHub, defaultName: () -> String = DefaultPlayerName.get, initialPhoto: ChosenPhoto? = nil) {
         self.mode = mode
         self.settings = settings
         self.hub = hub
@@ -36,7 +36,7 @@ final class LobbyModel: ObservableObject, ScreenModel {
         customJpeg = initialPhoto?.jpeg
         grid = settings.gridSize
         let saved = settings.playerName?.trimmingCharacters(in: .whitespacesAndNewlines)
-        myName = saved.flatMap { $0.isEmpty ? nil : settings.playerName } ?? deviceName()
+        myName = saved.flatMap { $0.isEmpty ? nil : settings.playerName } ?? defaultName()
         // Views observe this model; forward hub changes (the match) to them.
         hubSubscription = hub.objectWillChange.sink { [weak self] _ in self?.objectWillChange.send() }
         // Start hosting after the screen is built, not while SwiftUI is creating it.

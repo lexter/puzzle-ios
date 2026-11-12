@@ -11,8 +11,11 @@ enum PickResult {
 /// "ios"; sent in the P2P handshake.
 let platformName = "ios"
 
-enum DeviceName {
-    @MainActor static func get() -> String { UIDevice.current.name }
+/// Player name used until the player sets one. It's advertised over Bonjour, so it must not
+/// identify the owner: the device model ("iPhone", "iPad"), never `UIDevice.name`, which on
+/// iOS 15 is the user-assigned name (e.g. "Jane's iPhone").
+enum DefaultPlayerName {
+    @MainActor static func get() -> String { UIDevice.current.model }
 }
 
 /// Opens this app's page in the system Settings (for denied permissions).

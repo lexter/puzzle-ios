@@ -10,12 +10,17 @@ struct MatchConfig: Equatable {
     let mode: Mode
     let customImage: Bool
     let imageBytes: Int
+
+    /// False for a config from a peer that would produce a board this app can't build.
+    var isValid: Bool { (PuzzleState.minSize...PuzzleState.maxSize).contains(grid) }
 }
 
 /// Control messages. The JSON shape (a `type` discriminator plus fields) is the wire format
 /// shared with the Android app, so names and field keys must not change.
 enum MatchMessage: Equatable {
     static let countdownMs: Int64 = 3_000
+    /// Longest countdown a guest will honour; a peer's `start` is clamped to `0...maxCountdownMs`.
+    static let maxCountdownMs: Int64 = 10_000
 
     case hello(protocolVersion: Int, playerName: String, platform: String)
     case config(MatchConfig)

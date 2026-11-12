@@ -18,9 +18,11 @@ struct PuzzleState: Equatable {
         self.moves = moves
     }
 
-    /// Validating initializer for boards received from a peer.
+    /// Validating initializer for boards received from a peer: `tiles` must hold each of
+    /// `0..<size²` exactly once (the board view keys tiles by number and traps on duplicates).
     init?(validating size: Int, tiles: [Int], moves: Int) {
         guard (PuzzleState.minSize...PuzzleState.maxSize).contains(size), tiles.count == size * size else { return nil }
+        guard tiles.sorted() == Array(0..<(size * size)) else { return nil }
         self.init(size: size, tiles: tiles, moves: moves)
     }
 
