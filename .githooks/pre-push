@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Build gate: compiles the app and the unit-test bundle for the simulator before anything is pushed.
+# Install with scripts/install-hooks.sh. Skip once with `git push --no-verify`.
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+
+echo "pre-push: building Puzzle and PuzzleTests for the iOS Simulator…"
+log=$(mktemp)
+trap 'rm -f "$log"' EXIT
+if ! xcodebuild build-for-testing \
+  -project Puzzle.xcodeproj \
+  -scheme Puzzle \
+  -destination "generic/platform=iOS Simulator" \
+  -derivedDataPath build/pre-push \
+  -quiet \
+  CODE_SIGNING_ALLOWED=NO > "$log" 2>&1; then
+  grep -E "error:|BUILD FAILED" "$log" >&2 || tail -n 40 "$log" >&2
+  echo "pre-push: build failed; push aborted." >&2
+  exit 1
+fi
+echo "pre-push: build OK"

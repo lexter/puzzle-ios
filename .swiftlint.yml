@@ -1,0 +1,31 @@
+# Lint rules for Puzzle. The pre-commit hook and CI run `swiftlint lint --strict`, so any
+# violation (warning or error) blocks a commit. Thresholds follow the codebase's existing style.
+included:
+  - Puzzle
+  - PuzzleTests
+
+disabled_rules:
+  - trailing_comma
+  # LegacyPreferencesImport decodes leniently on purpose (String(decoding:as:) never fails).
+  - optional_data_string_conversion
+
+identifier_name:
+  # Short names (n, x, dx, i) are idiomatic for board math.
+  min_length: 1
+  max_length: 50
+
+line_length:
+  warning: 180
+  error: 220
+  ignores_comments: true
+  ignores_urls: true
+
+cyclomatic_complexity:
+  # Message dispatch is one flat switch.
+  ignores_case_statements: true
+
+large_tuple:
+  warning: 3
+
+file_length:
+  warning: 500

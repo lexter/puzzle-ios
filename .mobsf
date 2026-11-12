@@ -1,0 +1,9 @@
+---
+# mobsfscan settings for CI (`mobsfscan --exit-warning .`). Each ignored rule says why it doesn't apply.
+- ignore-paths:
+    - build
+    - DerivedData
+  ignore-rules:
+    # Int64.random(in:) uses SystemRandomNumberGenerator, a CSPRNG. The values are puzzle
+    # shuffle seeds that are sent to the other player anyway, not secrets.
+    - ios_insecure_random_no_generator

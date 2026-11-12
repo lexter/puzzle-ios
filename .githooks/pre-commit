@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# Lint gate: SwiftLint (strict) on staged Swift files, plus the privacy guard.
+# Install with scripts/install-hooks.sh. Skip once with `git commit --no-verify`.
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+
+staged=()
+while IFS= read -r -d '' file; do
+  staged+=("$file")
+done < <(git diff --cached --name-only --diff-filter=ACMR -z -- '*.swift')
+
+if (( ${#staged[@]} )); then
+  if ! command -v swiftlint > /dev/null; then
+    echo "pre-commit: swiftlint not found. Install it with: brew install swiftlint" >&2
+    exit 1
+  fi
+  # Lint the staged content, not the working tree, so unstaged edits can't hide violations.
+  tmp=$(cd "$(mktemp -d)" && pwd -P)
+  trap 'rm -rf "$tmp"' EXIT
+  git checkout-index --prefix="$tmp/" -- "${staged[@]}"
+  cp .swiftlint.yml "$tmp/"
+  if ! output=$(cd "$tmp" && swiftlint lint --strict --quiet --config .swiftlint.yml -- "${staged[@]}" 2>&1); then
+    echo "${output//$tmp\//}" >&2
+    echo "pre-commit: SwiftLint failed. Fix the violations above (\`swiftlint --fix\` handles many)." >&2
+    exit 1
+  fi
+fi
+
+scripts/privacy-guard.sh > /dev/null

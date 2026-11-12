@@ -73,9 +73,12 @@ enum PuzzleEngine {
     private enum Direction: CaseIterable {
         case up, down, left, right
 
+        // One-line switches keep these lookup tables readable.
+        // swiftlint:disable switch_case_alignment
         var dRow: Int { switch self { case .up: return -1; case .down: return 1; default: return 0 } }
         var dCol: Int { switch self { case .left: return -1; case .right: return 1; default: return 0 } }
         var opposite: Direction { switch self { case .up: return .down; case .down: return .up; case .left: return .right; case .right: return .left } }
+        // swiftlint:enable switch_case_alignment
         func step(_ size: Int) -> Int { dRow * size + dCol }
     }
 
